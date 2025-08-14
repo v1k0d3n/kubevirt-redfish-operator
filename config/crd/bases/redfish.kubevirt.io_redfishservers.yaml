@@ -1,0 +1,322 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: redfishservers.redfish.kubevirt.io
+spec:
+  group: redfish.kubevirt.io
+  names:
+    kind: RedfishServer
+    listKind: RedfishServerList
+    plural: redfishservers
+    singular: redfishserver
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.readyReplicas
+      name: Ready
+      type: integer
+    - jsonPath: .status.currentVersion
+      name: Version
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: RedfishServer is the Schema for the redfishservers API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: RedfishServerSpec defines the desired state of RedfishServer
+            properties:
+              authentication:
+                description: Authentication defines the authentication configuration
+                properties:
+                  users:
+                    description: Users is a list of users with their authentication
+                      details
+                    items:
+                      description: RedfishUserSpec defines the configuration for a
+                        Redfish user
+                      properties:
+                        chassis:
+                          description: Chassis is a list of chassis names this user
+                            has access to
+                          items:
+                            type: string
+                          type: array
+                        passwordSecret:
+                          description: PasswordSecret is the name of the secret containing
+                            the user's password
+                          type: string
+                        username:
+                          description: Username is the unique username for authentication
+                          type: string
+                      required:
+                      - chassis
+                      - passwordSecret
+                      - username
+                      type: object
+                    type: array
+                required:
+                - users
+                type: object
+              chassis:
+                description: Chassis defines the chassis configurations
+                items:
+                  description: RedfishChassisSpec defines the configuration for a
+                    Redfish chassis
+                  properties:
+                    description:
+                      description: Description provides a human-readable description
+                        of the chassis
+                      type: string
+                    name:
+                      description: Name is the unique identifier for the chassis
+                      type: string
+                    namespace:
+                      description: Namespace is the Kubernetes namespace where the
+                        chassis operates
+                      type: string
+                    serviceAccount:
+                      description: ServiceAccount is the service account to use for
+                        this chassis
+                      type: string
+                  required:
+                  - name
+                  - namespace
+                  type: object
+                type: array
+              image:
+                description: Image specifies the container image to use
+                type: string
+              imagePullPolicy:
+                description: ImagePullPolicy specifies the image pull policy
+                type: string
+              monitoring:
+                description: Monitoring defines the monitoring configuration
+                properties:
+                  enabled:
+                    description: Enabled indicates whether monitoring is enabled
+                    type: boolean
+                  metricsPort:
+                    description: MetricsPort is the port for metrics endpoint
+                    format: int32
+                    type: integer
+                  serviceMonitor:
+                    description: ServiceMonitor creates a Prometheus ServiceMonitor
+                    type: boolean
+                type: object
+              replicas:
+                description: Replicas specifies the number of replicas to run
+                format: int32
+                maximum: 10
+                minimum: 1
+                type: integer
+              resources:
+                description: Resources specifies the resource requirements
+                properties:
+                  claims:
+                    description: |-
+                      Claims lists the names of resources, defined in spec.resourceClaims,
+                      that are used by this container.
+
+                      This is an alpha field and requires enabling the
+                      DynamicResourceAllocation feature gate.
+
+                      This field is immutable. It can only be set for containers.
+                    items:
+                      description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                      properties:
+                        name:
+                          description: |-
+                            Name must match the name of one entry in pod.spec.resourceClaims of
+                            the Pod where this field is used. It makes that resource available
+                            inside a container.
+                          type: string
+                        request:
+                          description: |-
+                            Request is the name chosen for a request in the referenced claim.
+                            If empty, everything from the claim is made available, otherwise
+                            only the result of this request.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  limits:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Limits describes the maximum amount of compute resources allowed.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                  requests:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Requests describes the minimum amount of compute resources required.
+                      If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                      otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                type: object
+              routeEnabled:
+                description: RouteEnabled enables OpenShift route creation
+                type: boolean
+              routeHost:
+                description: RouteHost specifies the host for the OpenShift route
+                type: string
+              serviceType:
+                description: ServiceType specifies the type of service to create
+                type: string
+              tls:
+                description: TLS defines the TLS configuration
+                properties:
+                  certSecret:
+                    description: CertSecret is the name of the secret containing the
+                      TLS certificate
+                    type: string
+                  enabled:
+                    description: Enabled indicates whether TLS is enabled
+                    type: boolean
+                  insecureSkipVerify:
+                    description: InsecureSkipVerify allows insecure TLS connections
+                      (for development)
+                    type: boolean
+                  keySecret:
+                    description: KeySecret is the name of the secret containing the
+                      TLS private key
+                    type: string
+                type: object
+              version:
+                description: Version specifies the version of the Redfish server to
+                  deploy
+                type: string
+            required:
+            - authentication
+            - chassis
+            - version
+            type: object
+          status:
+            description: RedfishServerStatus defines the observed state of RedfishServer
+            properties:
+              conditions:
+                description: Conditions represents the latest available observations
+                  of a RedfishServer's current state
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              currentVersion:
+                description: CurrentVersion is the currently deployed version
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  by the controller
+                format: int64
+                type: integer
+              phase:
+                description: Phase represents the current phase of the RedfishServer
+                type: string
+              readyReplicas:
+                description: ReadyReplicas is the number of ready replicas
+                format: int32
+                type: integer
+              routeURL:
+                description: RouteURL is the URL where the route is accessible (OpenShift)
+                type: string
+              serviceURL:
+                description: ServiceURL is the URL where the service is accessible
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

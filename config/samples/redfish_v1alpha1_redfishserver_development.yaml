@@ -1,0 +1,35 @@
+apiVersion: redfish.kubevirt.io/v1alpha1
+kind: RedfishServer
+metadata:
+  name: development-redfish
+  namespace: development
+spec:
+  version: "latest"
+  replicas: 1
+  image: "quay.io/bjozsa-redhat/kubevirt-redfish:latest"
+  imagePullPolicy: Always
+  serviceType: ClusterIP
+  routeEnabled: false
+  chassis:
+    - name: "development-chassis"
+      namespace: "development"
+      description: "Development KubeVirt chassis"
+      serviceAccount: "development-redfish-sa"
+  authentication:
+    users:
+      - username: "dev-admin"
+        passwordSecret: "development-redfish-secret"
+        chassis: ["development-chassis"]
+  tls:
+    enabled: false
+  monitoring:
+    enabled: true
+    metricsPort: 8443
+    serviceMonitor: true
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "2Gi" 

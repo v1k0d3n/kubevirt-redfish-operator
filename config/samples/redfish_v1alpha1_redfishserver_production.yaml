@@ -1,0 +1,35 @@
+apiVersion: redfish.kubevirt.io/v1alpha1
+kind: RedfishServer
+metadata:
+  name: production-redfish
+  namespace: production
+spec:
+  version: "latest"
+  replicas: 1
+  image: "quay.io/bjozsa-redhat/kubevirt-redfish:latest"
+  imagePullPolicy: Always
+  serviceType: ClusterIP
+  routeEnabled: false
+  chassis:
+    - name: "production-chassis"
+      namespace: "production"
+      description: "Production KubeVirt chassis"
+      serviceAccount: "production-redfish-sa"
+  authentication:
+    users:
+      - username: "prod-admin"
+        passwordSecret: "production-redfish-secret"
+        chassis: ["production-chassis"]
+  tls:
+    enabled: false
+  monitoring:
+    enabled: true
+    metricsPort: 8443
+    serviceMonitor: true
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "2Gi" 
