@@ -124,6 +124,15 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
         cache: true
         
+    - name: Set up envtest
+      run: |
+        echo "Setting up envtest..."
+        # Install envtest binaries
+        go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+        # Set up envtest environment
+        eval $(setup-envtest use -p env)
+        echo "KUBEBUILDER_ASSETS: $KUBEBUILDER_ASSETS"
+        
     - name: Run tests
       run: |
         echo "Running tests..."
@@ -164,6 +173,15 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
         cache: true
+        
+    - name: Set up envtest
+      run: |
+        echo "Setting up envtest..."
+        # Install envtest binaries
+        go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+        # Set up envtest environment
+        eval $(setup-envtest use -p env)
+        echo "KUBEBUILDER_ASSETS: $KUBEBUILDER_ASSETS"
         
     - name: Run integration tests
       run: |
