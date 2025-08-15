@@ -100,6 +100,14 @@ func (r *RedfishServerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, err
 	}
 
+	// Ensure TypeMeta is set for owner references
+	if redfishServer.APIVersion == "" {
+		redfishServer.APIVersion = "redfish.kubevirt.io/v1alpha1"
+	}
+	if redfishServer.Kind == "" {
+		redfishServer.Kind = "RedfishServer"
+	}
+
 	// Validate the specification
 	if err := r.validateSpec(redfishServer.Spec); err != nil {
 		logger.Error(err, "Invalid RedfishServer specification")

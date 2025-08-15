@@ -50,6 +50,10 @@ var _ = Describe("RedfishServer Controller", func() {
 			err := k8sClient.Get(ctx, typeNamespacedName, redfishserver)
 			if err != nil && errors.IsNotFound(err) {
 				resource := &redfishv1alpha1.RedfishServer{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: "redfish.kubevirt.io/v1alpha1",
+						Kind:       "RedfishServer",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      resourceName,
 						Namespace: "default",
