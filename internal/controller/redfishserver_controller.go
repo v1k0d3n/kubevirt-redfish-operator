@@ -727,14 +727,7 @@ func (r *RedfishServerReconciler) reconcileRoute(ctx context.Context, redfishSer
 	}
 
 	_, err := ctrl.CreateOrUpdate(ctx, r.Client, route, func() error {
-		// Set host - use provided host or generate one
-		host := redfishServer.Spec.RouteHost
-		if host == "" {
-			host = fmt.Sprintf("%s-%s.apps.hub.lab.ocp.run", redfishServer.Name, redfishServer.Namespace)
-		}
-
 		route.Spec = routev1.RouteSpec{
-			Host: host,
 			Port: &routev1.RoutePort{
 				TargetPort: intstr.FromString("http"),
 			},
@@ -747,6 +740,12 @@ func (r *RedfishServerReconciler) reconcileRoute(ctx context.Context, redfishSer
 				Name:   redfishServer.Name,
 				Weight: &[]int32{100}[0],
 			},
+		}
+		
+		// Only set host if explicitly provided
+		// If not provided, let OpenShift auto-generate it
+		if redfishServer.Spec.RouteHost != "" {
+			route.Spec.Host = redfishServer.Spec.RouteHost
 		}
 
 		return ctrl.SetControllerReference(redfishServer, route, r.Scheme)
