@@ -5,8 +5,8 @@ set -e
 # Usage: ./scripts/build-and-push-operator.sh <tag>
 #
 # Environment variables:
-#   REGISTRY: Container registry (default: quay.io)
-#   NAMESPACE: Registry namespace (default: bjozsa-redhat)
+#   IMAGE_REGISTRY: Container registry (default: quay.io)
+#   IMAGE_NAMESPACE: Registry namespace (default: bjozsa-redhat)
 #   IMAGE_NAME: Image name (default: kubevirt-redfish-operator)
 #   QUAY_USERNAME: Registry username
 #   QUAY_PASSWORD: Registry password
@@ -16,8 +16,8 @@ if [ $# -eq 0 ]; then
     echo "Example: $0 v0.1.0"
     echo ""
     echo "Environment variables:"
-    echo "  REGISTRY: Container registry (default: quay.io)"
-    echo "  NAMESPACE: Registry namespace (default: bjozsa-redhat)"
+    echo "  IMAGE_REGISTRY: Container registry (default: quay.io)"
+    echo "  IMAGE_NAMESPACE: Registry namespace (default: bjozsa-redhat)"
     echo "  IMAGE_NAME: Image name (default: kubevirt-redfish-operator)"
     echo "  QUAY_USERNAME: Registry username"
     echo "  QUAY_PASSWORD: Registry password"
@@ -25,21 +25,21 @@ if [ $# -eq 0 ]; then
 fi
 
 TAG=$1
-REGISTRY="${REGISTRY:-quay.io}"
-NAMESPACE="${NAMESPACE:-bjozsa-redhat}"
+IMAGE_REGISTRY="${IMAGE_REGISTRY:-quay.io}"
+IMAGE_NAMESPACE="${IMAGE_NAMESPACE:-bjozsa-redhat}"
 IMAGE_NAME="${IMAGE_NAME:-kubevirt-redfish-operator}"
-FULL_IMAGE_NAME="${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${TAG}"
+FULL_IMAGE_NAME="${IMAGE_REGISTRY}/${IMAGE_NAMESPACE}/${IMAGE_NAME}:${TAG}"
 
 echo "Building operator container image for tag: ${TAG}"
 echo "Image: ${FULL_IMAGE_NAME}"
-echo "Registry: ${REGISTRY}"
-echo "Namespace: ${NAMESPACE}"
+echo "Registry: ${IMAGE_REGISTRY}"
+echo "Namespace: ${IMAGE_NAMESPACE}"
 echo "Image Name: ${IMAGE_NAME}"
 
 # Debug: Show available variables (without sensitive data)
 echo "Debug: Available variables:"
-echo "REGISTRY: ${REGISTRY}"
-echo "NAMESPACE: ${NAMESPACE}"
+echo "IMAGE_REGISTRY: ${IMAGE_REGISTRY}"
+echo "IMAGE_NAMESPACE: ${IMAGE_NAMESPACE}"
 echo "IMAGE_NAME: ${IMAGE_NAME}"
 echo "QUAY_USERNAME: ${QUAY_USERNAME:+set}"
 echo "QUAY_PASSWORD: ${QUAY_PASSWORD:+set}"
@@ -55,8 +55,8 @@ echo "Building operator binary..."
 make build
 
 # Login to registry
-echo "Logging into ${REGISTRY}..."
-buildah login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" "${REGISTRY}"
+echo "Logging into ${IMAGE_REGISTRY}..."
+buildah login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" "${IMAGE_REGISTRY}"
 
 # Build the container using Buildah
 echo "Building operator container image..."

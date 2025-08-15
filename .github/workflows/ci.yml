@@ -15,8 +15,8 @@ env:
   GOARCH: 'amd64'
   
   # Container registry configuration
-  REGISTRY: 'quay.io'
-  NAMESPACE: 'bjozsa-redhat'
+  IMAGE_REGISTRY: 'quay.io'
+  IMAGE_NAMESPACE: 'bjozsa-redhat'
   IMAGE_NAME: 'kubevirt-redfish-operator'
 
 jobs:
@@ -124,7 +124,7 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
         cache: true
         
-    - name: Set up envtest
+    - name: Run tests
       run: |
         echo "Setting up envtest..."
         # Install envtest binaries
@@ -133,13 +133,18 @@ jobs:
         eval $(setup-envtest use -p env)
         echo "KUBEBUILDER_ASSETS: $KUBEBUILDER_ASSETS"
         
-    - name: Run tests
-      run: |
         echo "Running tests..."
         go test -v ./...
         
     - name: Run tests with coverage
       run: |
+        echo "Setting up envtest..."
+        # Install envtest binaries
+        go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+        # Set up envtest environment
+        eval $(setup-envtest use -p env)
+        echo "KUBEBUILDER_ASSETS: $KUBEBUILDER_ASSETS"
+        
         echo "Running tests with coverage..."
         go test -v -coverprofile=coverage.out ./...
         echo "Coverage summary:"
@@ -174,7 +179,7 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
         cache: true
         
-    - name: Set up envtest
+    - name: Run integration tests
       run: |
         echo "Setting up envtest..."
         # Install envtest binaries
@@ -183,8 +188,6 @@ jobs:
         eval $(setup-envtest use -p env)
         echo "KUBEBUILDER_ASSETS: $KUBEBUILDER_ASSETS"
         
-    - name: Run integration tests
-      run: |
         echo "Ensuring dependencies are up to date..."
         go mod download
         go mod tidy
@@ -283,7 +286,7 @@ jobs:
     - name: Log in to Quay.io
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
+        registry: ${{ env.IMAGE_REGISTRY }}
         username: ${{ secrets.QUAY_USERNAME }}
         password: ${{ secrets.QUAY_PASSWORD }}
         
@@ -291,7 +294,7 @@ jobs:
       id: tags
       run: |
         COMMIT_SHA="${GITHUB_SHA:0:8}"
-        IMAGE_BASE="${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}"
+        IMAGE_BASE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}"
         
         # Create tags like GitLab CI does - only commit SHA
         TAGS="${IMAGE_BASE}:${COMMIT_SHA}"
@@ -328,7 +331,7 @@ jobs:
         echo "Container images pushed with tags:"
         echo "${{ steps.tags.outputs.tags }}"
         echo "Commit SHA: ${{ steps.tags.outputs.commit_sha }}"
-        echo "Registry: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}"
+        echo "Registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}"
 
   # Container build and push for git tags
   container-build-tag:
@@ -345,7 +348,7 @@ jobs:
     - name: Log in to Quay.io
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
+        registry: ${{ env.IMAGE_REGISTRY }}
         username: ${{ secrets.QUAY_USERNAME }}
         password: ${{ secrets.QUAY_PASSWORD }}
         
@@ -353,7 +356,7 @@ jobs:
       id: tags
       run: |
         TAG_NAME="${GITHUB_REF#refs/tags/}"
-        IMAGE_BASE="${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}"
+        IMAGE_BASE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}"
         
         # Create only the git tag (e.g., v0.2.0)
         TAGS="${IMAGE_BASE}:${TAG_NAME}"
@@ -391,7 +394,7 @@ jobs:
     - name: Log in to Quay.io
       uses: docker/login-action@v3
       with:
-        registry: ${{ env.REGISTRY }}
+        registry: ${{ env.IMAGE_REGISTRY }}
         username: ${{ secrets.QUAY_USERNAME }}
         password: ${{ secrets.QUAY_PASSWORD }}
         
@@ -403,8 +406,8 @@ jobs:
         
         # Use the commit SHA tag from the successful build
         COMMIT_SHA="${{ needs.container-build-commit.outputs.commit_sha }}"
-        SOURCE_IMAGE="${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${COMMIT_SHA}"
-        LATEST_IMAGE="${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
+        SOURCE_IMAGE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:${COMMIT_SHA}"
+        LATEST_IMAGE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
         
         echo "Tagging image with 'latest'"
         echo "Source: ${SOURCE_IMAGE}"

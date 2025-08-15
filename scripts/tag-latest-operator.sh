@@ -5,8 +5,8 @@ set -e
 # Usage: ./scripts/tag-latest-operator.sh <commit-sha>
 #
 # Environment variables:
-#   REGISTRY: Container registry (default: quay.io)
-#   NAMESPACE: Registry namespace (default: bjozsa-redhat)
+#   IMAGE_REGISTRY: Container registry (default: quay.io)
+#   IMAGE_NAMESPACE: Registry namespace (default: bjozsa-redhat)
 #   IMAGE_NAME: Image name (default: kubevirt-redfish-operator)
 #   QUAY_USERNAME: Registry username
 #   QUAY_PASSWORD: Registry password
@@ -16,8 +16,8 @@ if [ $# -eq 0 ]; then
     echo "Example: $0 85b872ea"
     echo ""
     echo "Environment variables:"
-    echo "  REGISTRY: Container registry (default: quay.io)"
-    echo "  NAMESPACE: Registry namespace (default: bjozsa-redhat)"
+    echo "  IMAGE_REGISTRY: Container registry (default: quay.io)"
+    echo "  IMAGE_NAMESPACE: Registry namespace (default: bjozsa-redhat)"
     echo "  IMAGE_NAME: Image name (default: kubevirt-redfish-operator)"
     echo "  QUAY_USERNAME: Registry username"
     echo "  QUAY_PASSWORD: Registry password"
@@ -25,11 +25,11 @@ if [ $# -eq 0 ]; then
 fi
 
 COMMIT_SHA=$1
-REGISTRY="${REGISTRY:-quay.io}"
-NAMESPACE="${NAMESPACE:-bjozsa-redhat}"
+IMAGE_REGISTRY="${IMAGE_REGISTRY:-quay.io}"
+IMAGE_NAMESPACE="${IMAGE_NAMESPACE:-bjozsa-redhat}"
 IMAGE_NAME="${IMAGE_NAME:-kubevirt-redfish-operator}"
-SOURCE_IMAGE="${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${COMMIT_SHA}"
-LATEST_IMAGE="${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:latest"
+SOURCE_IMAGE="${IMAGE_REGISTRY}/${IMAGE_NAMESPACE}/${IMAGE_NAME}:${COMMIT_SHA}"
+LATEST_IMAGE="${IMAGE_REGISTRY}/${IMAGE_NAMESPACE}/${IMAGE_NAME}:latest"
 
 echo "Tagging operator image with 'latest'"
 echo "Source: ${SOURCE_IMAGE}"
@@ -42,8 +42,8 @@ if [ -z "${QUAY_USERNAME}" ] || [ -z "${QUAY_PASSWORD}" ]; then
 fi
 
 # Login to registry
-echo "Logging into ${REGISTRY}..."
-buildah login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" "${REGISTRY}"
+echo "Logging into ${IMAGE_REGISTRY}..."
+buildah login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" "${IMAGE_REGISTRY}"
 
 # Pull the image with tag "${SOURCE_IMAGE}"
 echo "Pulling operator image..."
