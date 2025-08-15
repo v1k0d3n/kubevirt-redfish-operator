@@ -741,7 +741,7 @@ func (r *RedfishServerReconciler) reconcileRoute(ctx context.Context, redfishSer
 				Weight: &[]int32{100}[0],
 			},
 		}
-		
+
 		// Only set host if explicitly provided
 		// If not provided, let OpenShift auto-generate it
 		if redfishServer.Spec.RouteHost != "" {

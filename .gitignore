@@ -32,3 +32,4 @@ go.work
 
 # Any possible testing or production based files that may contain sensitive data
 deploy/*
+test/*
