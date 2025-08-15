@@ -345,12 +345,22 @@ func (r *RedfishServerReconciler) reconcileConfigMap(ctx context.Context, redfis
 				"namespace":       chassis.Namespace,
 				"description":     chassis.Description,
 				"service_account": chassis.ServiceAccount,
-				"vm_selector": map[string]interface{}{
+			}
+
+			// Add VM selector if specified
+			if chassis.VMSelector != nil && len(chassis.VMSelector) > 0 {
+				chassisConfig["vm_selector"] = map[string]interface{}{
+					"labels": chassis.VMSelector,
+				}
+			} else {
+				// Default VM selector if none specified
+				chassisConfig["vm_selector"] = map[string]interface{}{
 					"labels": map[string]string{
 						"redfish-enabled": "true",
 					},
-				},
+				}
 			}
+
 			chassisConfigs = append(chassisConfigs, chassisConfig)
 		}
 

@@ -105,6 +105,12 @@ spec:
                       description: ServiceAccount is the service account to use for
                         this chassis
                       type: string
+                    vmSelector:
+                      additionalProperties:
+                        type: string
+                      description: VMSelector defines the labels to select VMs for
+                        this chassis
+                      type: object
                   required:
                   - name
                   - namespace

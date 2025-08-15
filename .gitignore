@@ -25,3 +25,10 @@ go.work
 *.swp
 *.swo
 *~
+
+# =============================================================================
+# ENVIRONMENT-SPECIFIC FILES (DO NOT COMMIT TO GITHUB)
+# =============================================================================
+
+# Any possible testing or production based files that may contain sensitive data
+deploy/*

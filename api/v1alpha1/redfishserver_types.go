@@ -50,6 +50,8 @@ type RedfishChassisSpec struct {
 	Description string `json:"description,omitempty"`
 	// ServiceAccount is the service account to use for this chassis
 	ServiceAccount string `json:"serviceAccount,omitempty"`
+	// VMSelector defines the labels to select VMs for this chassis
+	VMSelector map[string]string `json:"vmSelector,omitempty"`
 }
 
 // RedfishUserSpec defines the configuration for a Redfish user
