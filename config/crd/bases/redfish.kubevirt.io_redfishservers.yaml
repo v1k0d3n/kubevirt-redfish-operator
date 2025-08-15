@@ -233,6 +233,32 @@ spec:
                 description: Version specifies the version of the Redfish server to
                   deploy
                 type: string
+              virtualMedia:
+                description: VirtualMedia defines virtual media configuration
+                properties:
+                  datavolume:
+                    description: DataVolume configuration for ISO operations
+                    properties:
+                      allowInsecureTLS:
+                        description: Allow insecure TLS for ISO downloads
+                        type: boolean
+                      helperImage:
+                        description: Helper image for ISO copy operations
+                        type: string
+                      isoDownloadTimeout:
+                        description: Timeout for ISO download operations
+                        type: string
+                      storageClass:
+                        description: Storage class for PVC creation
+                        type: string
+                      storageSize:
+                        description: Storage size for ISO images
+                        type: string
+                      vmUpdateTimeout:
+                        description: Timeout for VM update operations
+                        type: string
+                    type: object
+                type: object
             required:
             - authentication
             - chassis

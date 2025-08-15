@@ -92,6 +92,28 @@ type RedfishMonitoringSpec struct {
 	MetricsPort int32 `json:"metricsPort,omitempty"`
 }
 
+// DataVolumeSpec defines DataVolume configuration for virtual media operations
+type DataVolumeSpec struct {
+	// Storage size for ISO images
+	StorageSize string `json:"storageSize,omitempty"`
+	// Allow insecure TLS for ISO downloads
+	AllowInsecureTLS bool `json:"allowInsecureTLS,omitempty"`
+	// Storage class for PVC creation
+	StorageClass string `json:"storageClass,omitempty"`
+	// Timeout for VM update operations
+	VMUpdateTimeout string `json:"vmUpdateTimeout,omitempty"`
+	// Timeout for ISO download operations
+	ISODownloadTimeout string `json:"isoDownloadTimeout,omitempty"`
+	// Helper image for ISO copy operations
+	HelperImage string `json:"helperImage,omitempty"`
+}
+
+// VirtualMediaSpec defines virtual media configuration
+type VirtualMediaSpec struct {
+	// DataVolume configuration for ISO operations
+	DataVolume *DataVolumeSpec `json:"datavolume,omitempty"`
+}
+
 // RedfishServerSpec defines the desired state of RedfishServer
 type RedfishServerSpec struct {
 	// Version specifies the version of the Redfish server to deploy
@@ -108,6 +130,8 @@ type RedfishServerSpec struct {
 	TLS RedfishTLSSpec `json:"tls,omitempty"`
 	// Monitoring defines the monitoring configuration
 	Monitoring RedfishMonitoringSpec `json:"monitoring,omitempty"`
+	// VirtualMedia defines virtual media configuration
+	VirtualMedia VirtualMediaSpec `json:"virtualMedia,omitempty"`
 	// Image specifies the container image to use
 	Image string `json:"image,omitempty"`
 	// ImagePullPolicy specifies the image pull policy

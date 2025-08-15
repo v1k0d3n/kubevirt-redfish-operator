@@ -435,6 +435,17 @@ chassis:
     description: %s
     service_account: %s
 `, chassis.Name, chassis.Namespace, chassis.Description, chassis.ServiceAccount)
+
+		// Add VM selector if specified
+		if chassis.VMSelector != nil && len(chassis.VMSelector) > 0 {
+			config += `    vm_selector:
+      labels:
+`
+			for key, value := range chassis.VMSelector {
+				config += fmt.Sprintf(`        %s: "%s"
+`, key, value)
+			}
+		}
 	}
 
 	config += `authentication:
@@ -455,6 +466,37 @@ tls:
   key_secret: %s
   insecure_skip_verify: %t
 `, spec.TLS.CertSecret, spec.TLS.KeySecret, spec.TLS.InsecureSkipVerify)
+	}
+
+	// Add DataVolume configuration
+	if spec.VirtualMedia.DataVolume != nil {
+		config += `
+datavolume:
+`
+		if spec.VirtualMedia.DataVolume.StorageSize != "" {
+			config += fmt.Sprintf(`  storage_size: "%s"
+`, spec.VirtualMedia.DataVolume.StorageSize)
+		}
+		if spec.VirtualMedia.DataVolume.AllowInsecureTLS {
+			config += `  allow_insecure_tls: true
+`
+		}
+		if spec.VirtualMedia.DataVolume.StorageClass != "" {
+			config += fmt.Sprintf(`  storage_class: "%s"
+`, spec.VirtualMedia.DataVolume.StorageClass)
+		}
+		if spec.VirtualMedia.DataVolume.VMUpdateTimeout != "" {
+			config += fmt.Sprintf(`  vm_update_timeout: "%s"
+`, spec.VirtualMedia.DataVolume.VMUpdateTimeout)
+		}
+		if spec.VirtualMedia.DataVolume.ISODownloadTimeout != "" {
+			config += fmt.Sprintf(`  iso_download_timeout: "%s"
+`, spec.VirtualMedia.DataVolume.ISODownloadTimeout)
+		}
+		if spec.VirtualMedia.DataVolume.HelperImage != "" {
+			config += fmt.Sprintf(`  helper_image: "%s"
+`, spec.VirtualMedia.DataVolume.HelperImage)
+		}
 	}
 
 	return config
