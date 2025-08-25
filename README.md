@@ -133,7 +133,7 @@ Virtual media details:
 - Configurable timeouts and storage classes
 
 
-### 5. Access the Redfish API
+### 5. Apply the RedfishServer Configuration
 
 Apply the configuration:
 
@@ -141,7 +141,7 @@ Apply the configuration:
 kubectl apply -f redfishserver.yaml
 ```
 
-### 5. Access the Redfish API
+### 6. Access the Redfish API
 
 Get the Redfish server URL:
 
